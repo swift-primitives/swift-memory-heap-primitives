@@ -1,0 +1,9 @@
+# .github/metadata.yaml
+description: "Memory.Heap — a single owned, heap-allocated raw byte region with deterministic single-free; the element-free leaf an allocator carves typed storage from."
+topics:
+  - primitives
+  - memory
+  - heap
+homepage: "https://swift-institute.org"
+readme:
+  family: E
