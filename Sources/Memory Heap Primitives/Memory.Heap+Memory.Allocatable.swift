@@ -13,7 +13,9 @@ public import Memory_Allocator_Protocol_Primitives
 
 // MARK: - Memory.Allocatable (adopt-role) + Memory.Growable (fresh byte-construction)
 
-/// `Memory.Heap` adopts both element-free allocation seams. As a `Memory.Allocatable` it can be
+/// `Memory.Heap` adopts both element-free allocation seams.
+///
+/// As a `Memory.Allocatable` it can be
 /// wrapped as a passthrough `Memory.Allocator<Memory.Heap>` (the default `makeAllocator()` adopts the
 /// whole owned region). As a `Memory.Growable` it can be allocated fresh to a byte count — the
 /// `init(byteCount:alignment:)` in `Memory.Heap ~Copyable.swift` is exactly that requirement, so the
