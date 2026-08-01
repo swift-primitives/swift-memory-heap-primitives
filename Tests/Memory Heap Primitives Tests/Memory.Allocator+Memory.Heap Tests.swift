@@ -36,7 +36,7 @@ struct MemoryAllocatorHeapBackedTests {
             )
         }
 
-        @Test func freshPoolIsEmpty() throws {
+        @Test func `fresh pool is empty`() throws {
             let pool = try Self.makePool(capacity: Index<Slot>.Count(4))
             let cap = pool.capacity
             let alloc = pool.allocated
@@ -48,19 +48,19 @@ struct MemoryAllocatorHeapBackedTests {
             #expect(!exhausted)
         }
 
-        @Test func invalidCapacityThrows() {
+        @Test func `invalid capacity throws`() {
             var threw = false
             do { _ = try Self.makePool(capacity: Index<Slot>.Count(0)) } catch { if case .invalidCapacity = error { threw = true } }
             #expect(threw)
         }
 
-        @Test func slotSizeTooSmallThrows() {
+        @Test func `slot size too small throws`() {
             var threw = false
             do { _ = try Self.makePool(slotSize: 1, capacity: Index<Slot>.Count(4)) } catch { if case .slotSizeTooSmall = error { threw = true } }
             #expect(threw)
         }
 
-        @Test func allocatedSlotsAreDistinctAndHoldTypedContent() throws {
+        @Test func `allocated slots are distinct and hold typed content`() throws {
             var pool = try Self.makePool(capacity: Index<Slot>.Count(4))
             var slots: [Index<Slot>] = []
             for i in 0..<4 {
@@ -83,7 +83,7 @@ struct MemoryAllocatorHeapBackedTests {
             #expect(exhausted)
         }
 
-        @Test func exhaustionThrows() throws {
+        @Test func `exhaustion throws`() throws {
             var pool = try Self.makePool(capacity: Index<Slot>.Count(2))
             _ = try pool.allocateSlot()
             _ = try pool.allocateSlot()
@@ -92,7 +92,7 @@ struct MemoryAllocatorHeapBackedTests {
             #expect(exhaustedCapacity == Index<Slot>.Count(2))
         }
 
-        @Test func freeThenReallocateReusesSlotLIFO() throws {
+        @Test func `free then reallocate reuses slot LIFO`() throws {
             var pool = try Self.makePool(capacity: Index<Slot>.Count(4))
             let s0 = try pool.allocateSlot()
             let s1 = try pool.allocateSlot()
@@ -108,7 +108,7 @@ struct MemoryAllocatorHeapBackedTests {
             #expect(r1 == s1)
         }
 
-        @Test func doubleFreeDetectedEvenWithTypedContent() throws {
+        @Test func `double free detected even with typed content`() throws {
             var pool = try Self.makePool(capacity: Index<Slot>.Count(4))
             let slot = try pool.allocateSlot()
             // Write typed content that overwrites the slot's would-be free-list bytes.
@@ -120,7 +120,7 @@ struct MemoryAllocatorHeapBackedTests {
             #expect(doubleFreed)
         }
 
-        @Test func indexForPointerRoundTrips() throws {
+        @Test func `index for pointer round trips`() throws {
             var pool = try Self.makePool(capacity: Index<Slot>.Count(4))
             let s0 = try pool.allocateSlot()
             let s1 = try pool.allocateSlot()
@@ -130,7 +130,7 @@ struct MemoryAllocatorHeapBackedTests {
             #expect(i1 == s1)
         }
 
-        @Test func foreignPointerRejected() throws {
+        @Test func `foreign pointer rejected`() throws {
             var pool = try Self.makePool(capacity: Index<Slot>.Count(4))
             _ = try pool.allocateSlot()
             let foreign = UnsafeMutableRawPointer.allocate(byteCount: 16, alignment: 8)
@@ -140,7 +140,7 @@ struct MemoryAllocatorHeapBackedTests {
             #expect(rejected)
         }
 
-        @Test func resetReclaimsAllSlots() throws {
+        @Test func `reset reclaims all slots`() throws {
             var pool = try Self.makePool(capacity: Index<Slot>.Count(4))
             _ = try pool.allocateSlot()
             _ = try pool.allocateSlot()
@@ -162,7 +162,7 @@ struct MemoryAllocatorHeapBackedTests {
     @Suite struct Arena {
         typealias Arena = Memory.Allocator<Memory.Heap>.Arena
 
-        @Test func freshArenaHasFullCapacity() {
+        @Test func `fresh arena has full capacity`() {
             let arena = Arena(byteCount: 1024, alignment: .`8`)
             let cap = arena.capacity
             let alloc = arena.allocated
@@ -170,21 +170,21 @@ struct MemoryAllocatorHeapBackedTests {
             #expect(alloc.underlying == 0)
         }
 
-        @Test func allocateBumpsTheCursor() throws {
+        @Test func `allocate bumps the cursor`() throws {
             var arena = Arena(byteCount: 1024, alignment: .`8`)
             _ = try arena.allocate(count: Memory.Address.Count(UInt(100)), alignment: .`8`)
             let alloc = arena.allocated
             #expect(alloc.underlying >= 100)
         }
 
-        @Test func insufficientCapacityThrows() {
+        @Test func `insufficient capacity throws`() {
             var arena = Arena(byteCount: 16, alignment: .`8`)
             var threw = false
             do { _ = try arena.allocate(count: Memory.Address.Count(UInt(64)), alignment: .`8`) } catch { if case .insufficientCapacity = error { threw = true } }
             #expect(threw)
         }
 
-        @Test func resetReclaimsTheArena() throws {
+        @Test func `reset reclaims the arena`() throws {
             var arena = Arena(byteCount: 1024, alignment: .`8`)
             _ = try arena.allocate(count: Memory.Address.Count(UInt(100)), alignment: .`8`)
             arena.reset()
@@ -198,13 +198,13 @@ struct MemoryAllocatorHeapBackedTests {
     @Suite struct System {
         typealias System = Memory.Allocator<Memory.Heap>
 
-        @Test func heapBackedSystemReportsRegionCapacity() {
+        @Test func `heap backed system reports region capacity`() {
             let system = System(byteCount: 512, alignment: .`8`)
             let cap = system.capacity
             #expect(cap.underlying == 512)
         }
 
-        @Test func baseForwardsToResourceAndIsStable() {
+        @Test func `base forwards to resource and is stable`() {
             let system = System(byteCount: 256, alignment: .`8`)
             let first = system.base
             let second = system.base
