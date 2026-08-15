@@ -32,7 +32,8 @@ extension Memory.Heap {
     ///   safe to `deallocate`) and `capacity` is the region's byte capacity.
     @unsafe
     @inlinable
-    public consuming func take() -> (base: UnsafeMutableRawPointer, capacity: Memory.Address.Count) {
+    public consuming func take() -> (base: UnsafeMutableRawPointer, capacity: Memory.Address.Count)
+    {
         // SAFETY: [MEM-SAFE-031](a) — hands out the origin pointer `_base` (intact provenance), not a
         // SAFETY: pointer reconstituted from an integer address ([MEM-OWN-015]/[MEM-SAFE-029]). `discard
         // SAFETY: self` suppresses the deinit's free so ownership transfers exactly once to the caller;
