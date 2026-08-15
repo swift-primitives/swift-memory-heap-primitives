@@ -28,7 +28,10 @@ struct MemoryAllocatorHeapBackedTests {
         typealias Pool = Memory.Allocator<Memory.Heap>.Pool
         typealias Slot = Memory.Allocator<Memory.Heap>.Pool.Slot
 
-        static func makePool(slotSize: UInt = 16, capacity: Index<Slot>.Count) throws(Pool.Error) -> Pool {
+        static func makePool(
+            slotSize: UInt = 16,
+            capacity: Index<Slot>.Count
+        ) throws(Pool.Error) -> Pool {
             try Pool(
                 slotSize: Memory.Address.Count(UInt(slotSize)),
                 slotAlignment: Memory.Alignment.`8`,
@@ -50,13 +53,17 @@ struct MemoryAllocatorHeapBackedTests {
 
         @Test func `invalid capacity throws`() {
             var threw = false
-            do { _ = try Self.makePool(capacity: Index<Slot>.Count(0)) } catch { if case .invalidCapacity = error { threw = true } }
+            do { _ = try Self.makePool(capacity: Index<Slot>.Count(0)) } catch {
+                if case .invalidCapacity = error { threw = true }
+            }
             #expect(threw)
         }
 
         @Test func `slot size too small throws`() {
             var threw = false
-            do { _ = try Self.makePool(slotSize: 1, capacity: Index<Slot>.Count(4)) } catch { if case .slotSizeTooSmall = error { threw = true } }
+            do { _ = try Self.makePool(slotSize: 1, capacity: Index<Slot>.Count(4)) } catch {
+                if case .slotSizeTooSmall = error { threw = true }
+            }
             #expect(threw)
         }
 
@@ -88,7 +95,9 @@ struct MemoryAllocatorHeapBackedTests {
             _ = try pool.allocateSlot()
             _ = try pool.allocateSlot()
             var exhaustedCapacity: Index<Slot>.Count? = nil
-            do { _ = try pool.allocateSlot() } catch { if case .exhausted(let cap) = error { exhaustedCapacity = cap } }
+            do { _ = try pool.allocateSlot() } catch {
+                if case .exhausted(let cap) = error { exhaustedCapacity = cap }
+            }
             #expect(exhaustedCapacity == Index<Slot>.Count(2))
         }
 
@@ -136,7 +145,9 @@ struct MemoryAllocatorHeapBackedTests {
             let foreign = UnsafeMutableRawPointer.allocate(byteCount: 16, alignment: 8)
             defer { unsafe foreign.deallocate() }
             var rejected = false
-            do { unsafe try pool.deallocate(foreign) } catch { if case .foreignPointer = error { rejected = true } }
+            do { unsafe try pool.deallocate(foreign) } catch {
+                if case .foreignPointer = error { rejected = true }
+            }
             #expect(rejected)
         }
 
@@ -180,7 +191,9 @@ struct MemoryAllocatorHeapBackedTests {
         @Test func `insufficient capacity throws`() {
             var arena = Arena(byteCount: 16, alignment: .`8`)
             var threw = false
-            do { _ = try arena.allocate(count: Memory.Address.Count(UInt(64)), alignment: .`8`) } catch { if case .insufficientCapacity = error { threw = true } }
+            do {
+                _ = try arena.allocate(count: Memory.Address.Count(UInt(64)), alignment: .`8`)
+            } catch { if case .insufficientCapacity = error { threw = true } }
             #expect(threw)
         }
 
