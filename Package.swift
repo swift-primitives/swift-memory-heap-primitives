@@ -1,15 +1,15 @@
-// swift-tools-version: 6.3.3
+// swift-tools-version: 6.4
 
 import PackageDescription
 
 let package = Package(
     name: "swift-memory-heap-primitives",
     platforms: [
-        .macOS("27"),
-        .iOS("27"),
-        .tvOS("27"),
-        .watchOS("27"),
-        .visionOS("27"),
+        .macOS(.v27),
+        .iOS(.v27),
+        .tvOS(.v27),
+        .watchOS(.v27),
+        .visionOS(.v27),
     ],
     products: [
         .library(
@@ -22,11 +22,26 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-primitives/swift-memory-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-memory-allocation-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-byte-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-index-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-affine-primitives.git", branch: "main"),
+        .package(
+            url: "https://github.com/swift-primitives/swift-memory-primitives.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-memory-allocation-primitives.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-byte-primitives.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-index-primitives.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-affine-primitives.git",
+            branch: "main"
+        ),
     ],
     targets: [
         // Hosts the Memory.Heap leaf, its Memory.Region seam, AND — post dependency-inversion — its
@@ -40,22 +55,43 @@ let package = Package(
                 .product(name: "Memory Address Primitives", package: "swift-memory-primitives"),
                 .product(name: "Memory Alignment Primitives", package: "swift-memory-primitives"),
                 .product(name: "Memory Region Primitives", package: "swift-memory-primitives"),
-                .product(name: "Memory Primitives Standard Library Integration", package: "swift-memory-primitives"),
-                .product(name: "Memory Allocator Primitive", package: "swift-memory-allocation-primitives"),
-                .product(name: "Memory Allocator Protocol Primitives", package: "swift-memory-allocation-primitives"),
-                .product(name: "Memory Allocator Arena Primitives", package: "swift-memory-allocation-primitives"),
-                .product(name: "Memory Allocator Pool Primitives", package: "swift-memory-allocation-primitives"),
+                .product(
+                    name: "Memory Primitives Standard Library Integration",
+                    package: "swift-memory-primitives"
+                ),
+                .product(
+                    name: "Memory Allocator Primitive",
+                    package: "swift-memory-allocation-primitives"
+                ),
+                .product(
+                    name: "Memory Allocator Protocol Primitives",
+                    package: "swift-memory-allocation-primitives"
+                ),
+                .product(
+                    name: "Memory Allocator Arena Primitives",
+                    package: "swift-memory-allocation-primitives"
+                ),
+                .product(
+                    name: "Memory Allocator Pool Primitives",
+                    package: "swift-memory-allocation-primitives"
+                ),
                 .product(name: "Byte Primitive", package: "swift-byte-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Affine Discrete Primitives", package: "swift-affine-primitives"),
-                .product(name: "Affine Primitives Standard Library Integration", package: "swift-affine-primitives"),
+                .product(
+                    name: "Affine Primitives Standard Library Integration",
+                    package: "swift-affine-primitives"
+                ),
             ]
         ),
         .target(
             name: "Memory Heap Primitives Test Support",
             dependencies: [
                 "Memory Heap Primitives",
-                .product(name: "Memory Primitives Test Support", package: "swift-memory-primitives"),
+                .product(
+                    name: "Memory Primitives Test Support",
+                    package: "swift-memory-primitives"
+                ),
             ],
             path: "Tests/Support"
         ),
@@ -64,8 +100,14 @@ let package = Package(
             dependencies: [
                 "Memory Heap Primitives",
                 "Memory Heap Primitives Test Support",
-                .product(name: "Memory Allocation Primitives", package: "swift-memory-allocation-primitives"),
-                .product(name: "Memory Allocation Primitives Test Support", package: "swift-memory-allocation-primitives"),
+                .product(
+                    name: "Memory Allocation Primitives",
+                    package: "swift-memory-allocation-primitives"
+                ),
+                .product(
+                    name: "Memory Allocation Primitives Test Support",
+                    package: "swift-memory-allocation-primitives"
+                ),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
             ]
         ),
