@@ -1,19 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-//
-// Heap-backed allocator integration tests — relocated from swift-memory-allocation-primitives when
-// the heap → allocation edge was inverted (allocation must not name the concrete `Memory.Heap`; the
-// leaf hosts both the heap-backed conveniences AND their tests). Exercises
-// `Memory.Allocator<Memory.Heap>.{System (passthrough), Pool, Arena}`.
-
 import Index_Primitives
 import Memory_Allocation_Primitives
 import Memory_Heap_Primitives
@@ -21,8 +5,6 @@ import Testing
 
 @Suite(.serialized)
 struct MemoryAllocatorHeapBackedTests {
-
-    // MARK: - Pool (fixed-slot free list — Bit.Vector double-free, LIFO reuse, typed errors)
 
     @Suite struct Pool {
         typealias Pool = Memory.Allocator<Memory.Heap>.Pool
@@ -73,8 +55,7 @@ struct MemoryAllocatorHeapBackedTests {
             for i in 0..<4 {
                 let slot = try pool.allocateSlot()
                 slots.append(slot)
-                // Store typed content into the allocated slot (clobbering the in-band free-list bytes —
-                // sound precisely because an allocated slot's free-list link is dead).
+
                 unsafe pool.pointer(at: slot).storeBytes(of: 1000 + i, as: Int.self)
             }
             var readback: [Int] = []
@@ -107,12 +88,12 @@ struct MemoryAllocatorHeapBackedTests {
             let s1 = try pool.allocateSlot()
             let s2 = try pool.allocateSlot()
             _ = s2
-            try pool.deallocate(at: s1)  // free list head → s1
-            try pool.deallocate(at: s0)  // free list head → s0, s0.next → s1
+            try pool.deallocate(at: s1)
+            try pool.deallocate(at: s0)
             let afterFree = pool.allocated
             #expect(afterFree == Index<Slot>.Count(1))
-            let r0 = try pool.allocateSlot()  // LIFO: last freed (s0) first
-            let r1 = try pool.allocateSlot()  // then s1
+            let r0 = try pool.allocateSlot()
+            let r1 = try pool.allocateSlot()
             #expect(r0 == s0)
             #expect(r1 == s1)
         }
@@ -120,12 +101,13 @@ struct MemoryAllocatorHeapBackedTests {
         @Test func `double free detected even with typed content`() throws {
             var pool = try Self.makePool(capacity: Index<Slot>.Count(4))
             let slot = try pool.allocateSlot()
-            // Write typed content that overwrites the slot's would-be free-list bytes.
+
             unsafe pool.pointer(at: slot).storeBytes(of: 0x0BAD_F00D, as: Int.self)
-            try pool.deallocate(at: slot)  // first free: succeeds (Bit.Vector cleared)
+            try pool.deallocate(at: slot)
             var doubleFreed = false
-            do { try pool.deallocate(at: slot) }  // second free: Bit.Vector detects it
-            catch { if case .doubleFree = error { doubleFreed = true } }
+            do { try pool.deallocate(at: slot) } catch {
+                if case .doubleFree = error { doubleFreed = true }
+            }
             #expect(doubleFreed)
         }
 
@@ -168,8 +150,6 @@ struct MemoryAllocatorHeapBackedTests {
         }
     }
 
-    // MARK: - Arena (bump allocator over a Resource region)
-
     @Suite struct Arena {
         typealias Arena = Memory.Allocator<Memory.Heap>.Arena
 
@@ -205,8 +185,6 @@ struct MemoryAllocatorHeapBackedTests {
             #expect(alloc.underlying == 0)
         }
     }
-
-    // MARK: - System (passthrough — the bare allocator forwards the Region seam to its resource)
 
     @Suite struct System {
         typealias System = Memory.Allocator<Memory.Heap>

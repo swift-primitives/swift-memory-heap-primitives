@@ -44,10 +44,7 @@ let package = Package(
         ),
     ],
     targets: [
-        // Hosts the Memory.Heap leaf, its Memory.Region seam, AND — post dependency-inversion — its
-        // Memory.Allocatable / Memory.Growable conformances plus the heap-backed Allocator / Arena /
-        // Pool construction conveniences (moved down from swift-memory-allocation-primitives, which
-        // must not name a concrete leaf). The edge now points heap → allocation.
+
         .target(
             name: "Memory Heap Primitives",
             dependencies: [
